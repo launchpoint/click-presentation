@@ -25,11 +25,18 @@ function fields_for_multi($obj,$namespace=null)
   $name_stack[] = $namespace;
 }
 
-function fields_for($obj)
+function fields_for($obj_or_name, $data=null)
 {
   global $form_objs, $form_multi,$name_stack;
-  $form_objs[] = $obj;
-  $name_stack[] = singularize(tableize(get_class($obj)));
+  if(is_object($obj_or_name))
+  {
+    $data = $obj;
+    $obj_or_name = get_class($obj_or_name);
+  } else {
+    $data = (object)$data;
+  }
+  $form_objs[] = $data;
+  $name_stack[] = tableize($obj_or_name,false);
 }
 
 function end_fields_for()
@@ -178,13 +185,13 @@ function text_field()
   global $form_objs;
   $obj = $form_objs[count($form_objs)-1];
   $field = func_get_arg(0);
-  $value = $obj->$field;
+  $value = isset($obj->$field) ? $obj->$field : '';
   $attrs = array(
     'type'=>'text',
     'name'=>field_name($field),
     'value'=>$value
   );
-  if ($obj->errors && array_key_exists($field, $obj->errors) && array_key_exists($field, $obj->errors) && $obj->errors[$field]!='') $attrs['class'] = 'error_field';
+  if (isset($obj->errors) && isset($obj->errors[$field]) && $obj->errors[$field]!='') $attrs['class'] = 'error_field';
 
   $args = func_get_args();
   $s = splice_attrs($attrs, $args);

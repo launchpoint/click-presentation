@@ -72,6 +72,18 @@ function select_tag($name, $options, $defaults=null, $value_field='id', $display
 	{
 		if (is_numeric($k))
 		{
+		  if(!is_object($v))
+		  {
+  		  if(is_array($v))
+  		  {
+  		    $v = (object)$v;
+  		  } else {
+  		    $v = (object)array(
+  		      $value_field=>$v,
+  		      $display_field=>$v,
+  		    );
+  		  }
+  		}
 		  if(is_object($v->$value_field)) click_error("select_tag() is expecting $value_field to be a string or int, but it's an object");
 		  if(!is_string($v->$display_field) && !is_numeric($v->$display_field)) click_error("select_tag() is expecting $display_field to be a string, but it's not", array($options, $v, $v->$display_field));
       $value = $v->$value_field;
